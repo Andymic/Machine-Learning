@@ -3,12 +3,13 @@
 # @Email:  Andymic12@gmail.com
 # @Filename: stacked_ae.py
 # @Last modified by:   ragnar
-# @Last modified time: 2020-01-24T15:25:53-05:00
+# @Last modified time: 2020-01-24T15:46:27-05:00
 
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 from functools import partial
 from util import *
+import sys
 
 MODEL_DIR='./models'
 
@@ -27,24 +28,34 @@ n_outputs = n_inputs
 learning_rate = 0.001
 l2_reg = 0.0001
 
+activation = tf.nn.elu
+regularizer = tf.contrib.layers.l2_regularizer(l2_reg)
+initializer = tf.contrib.layers.variance_scaling_initializer()
+
 X = tf.placeholder(tf.float32, shape=[None, n_inputs])
-he_init = tf.contrib.layers.variance_scaling_initializer()
-l2_regularizer = tf.contrib.layers.l2_regularizer(l2_reg)
-dense_layer = partial(tf.layers.dense, #expects 2D
-                    activation=tf.nn.elu,
-                    kernel_initializer=he_init,
-                    kernel_regularizer=l2_regularizer)
 
-hidden1 = dense_layer(X, n_hidden1)
-hidden2 = dense_layer(hidden1, n_hidden2)
-hidden3 = dense_layer(hidden2, n_hidden3)
-outputs = dense_layer(hidden3, n_outputs, activation=None)
+weights1_init = initializer([n_inputs, n_hidden1])
+weights2_init = initializer([n_hidden1, n_hidden2])
 
-reconstruction_loss = tf.reduce_mean(tf.square(outputs - X)) #MSE
+weights1 = tf.Variable(weights1_init, dtype=tf.float32, name="weights1")
+weights2 = tf.Variable(weights2_init, dtype=tf.float32, name="weights2")
+weights3 = tf.transpose(weights2, name="weights3")  # tied weights
+weights4 = tf.transpose(weights1, name="weights4")  # tied weights
 
-reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
+biases1 = tf.Variable(tf.zeros(n_hidden1), name="biases1")
+biases2 = tf.Variable(tf.zeros(n_hidden2), name="biases2")
+biases3 = tf.Variable(tf.zeros(n_hidden3), name="biases3")
+biases4 = tf.Variable(tf.zeros(n_outputs), name="biases4")
 
-loss = tf.add_n([reconstruction_loss] + reg_losses)
+hidden1 = activation(tf.matmul(X, weights1) + biases1)
+hidden2 = activation(tf.matmul(hidden1, weights2) + biases2)
+hidden3 = activation(tf.matmul(hidden2, weights3) + biases3)
+outputs = tf.matmul(hidden3, weights4) + biases4
+
+reconstruction_loss = tf.reduce_mean(tf.square(outputs - X))
+reg_loss = regularizer(weights1) + regularizer(weights2)
+loss = reconstruction_loss + reg_loss
+
 optimizer = tf.train.AdamOptimizer(learning_rate)
 training_op = optimizer.minimize(loss)
 
@@ -57,9 +68,10 @@ batch_size = 150
 with tf.Session() as sess:
     init.run()
     for epoch in range(n_epochs):
-        n_batches = mnist.train.num_examples
-        for iter in range(n_batches):
-            print("\r{}%".format(100 * iter // n_batches), end="")
+        n_batches = mnist.train.num_examples // batch_size
+        for iteration in range(n_batches):
+            print("\r{}%".format(100 * iteration // n_batches), end="")
+            sys.stdout.flush()
             X_batch, y_batch = mnist.train.next_batch(batch_size)
             sess.run(training_op, feed_dict={X: X_batch})
         loss_train = reconstruction_loss.eval(feed_dict={X: X_batch})
@@ -80,5 +92,7 @@ def show_reconstructed_digits(X, outputs, model_path = None, n_test_digits = 2):
         plt.subplot(n_test_digits, 2, digit_index * 2 + 2)
         plot_image(outputs_val[digit_index])
 
-show_reconstructed_digits(X, outputs, MODEL_DIR+"/my_model_all_layers.ckpt")
+
+show_reconstructed_digits(X, outputs, MODEL_DIR+"/stacked_ae.ckpt")
 save_fig("reconstruction_plot")
+plt.show()
