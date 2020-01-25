@@ -3,15 +3,16 @@
 # @Email:  Andymic12@gmail.com
 # @Filename: pca.py
 # @Last modified by:   ragnar
-# @Last modified time: 2020-01-24T14:55:00-05:00
+# @Last modified time: 2020-01-25T10:50:20-05:00
 
 #Examples from  the Hands-On Machine Learning
 #with Scikit-Learn and Tensorflow book
 
 import tensorflow as tf
 import numpy as np
-from util import *
 import matplotlib
+from utils.plt_funcs import *
+
 plt.rcParams['axes.labelsize'] = 14
 plt.rcParams['xtick.labelsize'] = 12
 plt.rcParams['ytick.labelsize'] = 12
