@@ -12,9 +12,9 @@ import pandas as pd
 import sklearn.linear_model
 import sklearn.neighbors
 from utils.data_funcs import *
-import envs
+import config
 
-data_dir = os.path.join(envs.DATA_DIR, 'lifesat', '')
+data_dir = os.path.join(config.DATA_DIR, 'lifesat', '')
 
 oecd_bli = pd.read_csv(data_dir + "oecd_bli_2015.csv", thousands=',')
 gdp_per_capita = pd.read_csv(data_dir + "gdp_per_capita.csv",thousands=',',delimiter='\t',

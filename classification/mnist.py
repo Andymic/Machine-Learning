@@ -4,7 +4,7 @@
 # @Last modified time: 2020-03-06T12:31:28-05:00
 
 import numpy as np
-import envs
+import config
 import os
 
 def sort_by_target(mnist):
@@ -17,7 +17,7 @@ def sort_by_target(mnist):
 
 try:
     from sklearn.datasets import fetch_openml
-    mnist = fetch_openml('mnist_784', data_home=envs.DATA_DIR, version=1, cache=True)
+    mnist = fetch_openml('mnist_784', data_home=config.DATA_DIR, version=1, cache=True)
     mnist.target = mnist.target.astype(np.int8) # fetch_openml() returns targets as strings
     sort_by_target(mnist) # fetch_openml() returns an unsorted dataset
 except ImportError:
