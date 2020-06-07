@@ -4,7 +4,7 @@
 import tensorflow as tf
 import config
 import numpy as np
-
+et
 model = tf.keras.Sequential([tf.keras.layers.Dense(units=1, input_shape=[1])])
 
 
