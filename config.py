@@ -9,6 +9,20 @@ import tensorflow as tf
 
 DATA_DIR = os.path.join(os.getcwd(), 'data', '')
 
+# Something weird about TF2 where you need to explicitly set the mem growth for the 
+# physical devices otherwise cuda fail to initialize
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
+
 # Tensorflow GPU config
 tf_config = tf.compat.v1.ConfigProto()
 tf_config.gpu_options.allow_growth = True

@@ -5,6 +5,12 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.compat.v1.Session(config=config)
+
+tf.compat.v1.keras.backend.set_session(sess)
+
 print(tf.__version__)
 """
     Enables callback while model is training 
