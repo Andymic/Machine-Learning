@@ -34,6 +34,7 @@ for s, l in test_data:
 training_labels_final = np.array(training_labels)
 testing_labels_final = np.array(testing_labels)
 
+print(testing_labels)
 vocab_size = 10000
 embedding_dim = 16
 max_length = 120
