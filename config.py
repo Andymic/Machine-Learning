@@ -36,3 +36,9 @@ SESS = tf.compat.v1.Session(config=tf_config)
 # 3 = INFO, WARNING, and ERROR messages are not printed
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+def reset_session():
+    tf.keras.backend.clear_session()
+    SESS = tf.compat.v1.Session(config=tf_config)
+    
+  
+
